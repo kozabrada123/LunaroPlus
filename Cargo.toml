@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 discord-sdk = "0.3.0"
+screenshots = "0.4.3"
+leptess = "0.13.2"
+substring = "1.4.5"
