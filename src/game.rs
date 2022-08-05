@@ -5,18 +5,14 @@ Pls no sue DE
 
 */
 
-
-
 use screenshots::{Screen, DisplayInfo};
-use std::{fs, time::Instant};
+use std::{fs, time::Instant, num::ParseIntError};
 use substring::Substring;
 
 pub mod ocr;
 
-pub fn get_ping() -> u16 {
+pub fn get_ping() -> Result<u16, ParseIntError> {
     // Get screenshot from monitor
-
-    let start = Instant::now();
     
     let screens = Screen::all().unwrap();
 
@@ -42,8 +38,10 @@ pub fn get_ping() -> u16 {
 
     let mut ocrresult = ocr::ocr_ping();
 
-    //return 
-    return ocrresult;
+    // Return what we get
+    ocrresult
+    
+    
 
 
 }
