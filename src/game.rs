@@ -13,7 +13,7 @@ use substring::Substring;
 
 pub mod ocr;
 
-pub fn get_ping() {
+pub fn get_ping() -> u16 {
     // Get screenshot from monitor
 
     let start = Instant::now();
@@ -41,9 +41,9 @@ pub fn get_ping() {
     // Give it to leptonica to get the cocaine
 
     let mut ocrresult = ocr::ocr_ping();
-    println!("{} ms", ocrresult);
 
-    println!("({:?})", start.elapsed());
+    //return 
+    return ocrresult;
 
 
 }
