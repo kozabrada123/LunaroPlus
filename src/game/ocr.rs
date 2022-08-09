@@ -21,8 +21,19 @@ pub fn ocr_ping() -> Result<u16, ParseIntError> {
         result.to_lowercase().rfind("ms").unwrap_or(0),
     );
 
+    let out_num: Result<u16, ParseIntError> = ping.parse::<u16>();
+
+    if out_num.is_err() {
+        // we have no valid ping measurement, check if we are in a game of lunaro / warframe
+        if result.to_lowercase().contains("rate") {
+            // We are, either in a random wf game or we are host
+            // Signify that we are host
+            return Ok(0);
+        }
+    }
+
     // Return whether or not we have a valid ping
-    ping.parse::<u16>()
+    out_num
 }
 
 pub fn ocr_text() -> String {

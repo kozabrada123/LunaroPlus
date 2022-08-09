@@ -14,8 +14,9 @@ use substring::Substring;
 use palette::{ Hsv, Srgb, FromColor, LinSrgb, Hsl, Srgba, IntoColor};
 
 pub mod ocr;
+pub mod types;
 
-pub fn get_ping() -> Result<u16, ParseIntError> {
+pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
     // Get screenshot from monitor
 
     let screens = Screen::all().unwrap();
@@ -97,6 +98,17 @@ pub fn get_ping() -> Result<u16, ParseIntError> {
     // Give it to leptonica to get the cocaine
 
     let mut ocrresult = ocr::ocr_ping();
+
+    // see what our status is
+    match ocrresult {
+        Ok(0) => {
+            gamedata.status = types::GameStatus::StatusGameHost{}; 
+            // Raise an error because aaaa our main func is kinda garbage
+            ocrresult = "ligma".parse::<u16>();
+        },
+        Ok(_num) => gamedata.status = types::GameStatus::StatusInGame{},
+        Err(ref ParseIntError) => gamedata.status = types::GameStatus::StatusNoGame{},
+    }
 
     // Return what we get
     ocrresult

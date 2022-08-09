@@ -16,13 +16,6 @@ fn main() {
     // Game's data as a struct
     let mut game = game::types::GameData::new();
 
-
-    // Pings == sum of all measurments
-    let mut pings: u32 = 0;
-
-    // Pingnums == number of measurments
-    let mut pingnums: u16 = 0;
-
     let mut out_p = String::new();
     let mut out = String::new();
     
@@ -31,32 +24,34 @@ fn main() {
         let start = Instant::now();
 
         // Try to get ping and see if we can
-        let pong = game::get_ping();
+        let pong = game::get_ping(&mut game);
 
         match pong {
             Ok(ping) => {
                 // Yay! we can!
-                pings += ping as u32;
+                game._all_ping += ping as u32;
 
-                pingnums += 1;
+                game.measurments += 1;
 
-                let avg = pings as f32 / pingnums as f32;
+                game.curr_ping = ping;
+
+                game.average_ping =  game._all_ping as f32 / game.measurments as f32;
 
                 out = format!(
                     "
                     Cur: {}ms
                     Avg: {:.1}ms
                     ",
-                    ping,
-                    avg,
-                    pingnums,
-                    start.elapsed()
+                    game.curr_ping,
+                    game.average_ping,
                 );
             }
             Err(_) => {
-                // We can't
-                // L rip bozo just wait
-                out = "Can't get ocr..".to_string();
+                match game.status {
+                    game::types::GameStatus::StatusGameHost {} => {out = "Cur: 0ms\nAvg: 0ms".to_string(); },
+                    game::types::GameStatus::StatusInGame {} => {out = "Can't get ocr..".to_string(); },
+                    game::types::GameStatus::StatusNoGame {} => {out = "Warframe doesn't seem to be running..".to_string(); },
+                }
             }
         }
 
