@@ -13,6 +13,9 @@ fn main() {
     // Clear the screen immediately
     //print!("\x1B[2J\x1B[1;1H");
 
+    // Game's data as a struct
+    let mut game = game::types::GameData::new();
+
 
     // Pings == sum of all measurments
     let mut pings: u32 = 0;
@@ -40,7 +43,10 @@ fn main() {
                 let avg = pings as f32 / pingnums as f32;
 
                 out = format!(
-                    "Cur: {}ms Avg: {:.1}ms Num: {}, Time: {:.2?}",
+                    "
+                    Cur: {}ms
+                    Avg: {:.1}ms
+                    ",
                     ping,
                     avg,
                     pingnums,
