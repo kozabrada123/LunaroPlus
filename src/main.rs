@@ -48,7 +48,7 @@ fn main() {
             }
             Err(_) => {
                 match game.status {
-                    game::types::GameStatus::StatusGameHost {} => {out = "Cur: 0ms\nAvg: 0ms".to_string(); },
+                    game::types::GameStatus::StatusGameHost {} => {out = "Cur: 0ms\nAvg: 0ms".to_string(); game.average_ping = 0.0; game.curr_ping = 0;},
                     game::types::GameStatus::StatusInGame {} => {out = "Can't get ocr..".to_string(); },
                     game::types::GameStatus::StatusNoGame {} => {out = "Warframe doesn't seem to be running..".to_string(); },
                 }
