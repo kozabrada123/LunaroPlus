@@ -48,9 +48,9 @@ fn main() {
             }
             Err(_) => {
                 match game.status {
-                    game::types::GameStatus::StatusGameHost {} => {out = "Cur: 0ms\nAvg: 0ms".to_string(); game.average_ping = 0.0; game.curr_ping = 0;},
+                    game::types::GameStatus::StatusGameHost {} => {out = "Cur: 0ms".to_string();},
                     game::types::GameStatus::StatusInGame {} => {out = "Can't get ocr..".to_string(); },
-                    game::types::GameStatus::StatusNoGame {} => {out = "Warframe doesn't seem to be running..".to_string(); },
+                    game::types::GameStatus::StatusNoGame {} => {out = out_p.clone(); },
                 }
             }
         }
@@ -61,10 +61,10 @@ fn main() {
 
             // Clear if it isn't "Can't get ocr.."
             //if out != "Can't get ocr..".to_string() {print!("\x1B[2J\x1B[1;1H");}
-            println!("{}", out);
+            println!("{}", &out);
         }
 
-        out_p = out;
+        out_p = out.clone();
     }
 }
 
