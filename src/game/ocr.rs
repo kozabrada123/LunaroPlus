@@ -12,7 +12,7 @@ use substring::Substring;
 pub fn ocr_ping() -> Result<u16, ParseIntError> {
     // Use leptonica to get ocr and parse it
     let mut lt = leptess::LepTess::new(None, "eng").unwrap();
-    lt.set_image("./pingp.png");
+    lt.set_image("./ping.png");
 
     let result = lt.get_utf8_text().unwrap();
 

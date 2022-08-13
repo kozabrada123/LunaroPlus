@@ -53,7 +53,7 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
     // Convert the u8 buffer to rgb and then make a mask
     // Put the mask in an new image
 
-    let mut new_img = image::RgbaImage::new(image.width(), image.height());
+    /*let mut new_img = image::RgbaImage::new(image.width(), image.height());
 
     // Crippling depressurizatuion
     let better_image = ImageReader::open("ping.png").unwrap().decode().unwrap();
@@ -100,7 +100,7 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
     
 
     // We need to write it aaaaaaaaaaa
-    new_img.save("./pingp.png");
+    new_img.save("./pingp.png");*/
 
     
     // Give it to leptonica to get the cocaine

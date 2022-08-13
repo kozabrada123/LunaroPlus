@@ -38,10 +38,8 @@ fn main() {
                 game.average_ping =  game._all_ping as f32 / game.measurments as f32;
 
                 out = format!(
-                    "
-                    Cur: {}ms
-                    Avg: {:.1}ms
-                    ",
+"Cur: {}ms
+Avg: {:.1}ms",
                     game.curr_ping,
                     game.average_ping,
                 );
