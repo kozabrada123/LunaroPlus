@@ -5,13 +5,14 @@ called by game
 
 */
 
+use regex::Regex;
 use std::{error::Error as ErrorTrait, fmt, fmt::Error, num::ParseIntError};
 use substring::Substring;
 
 pub fn ocr_ping() -> Result<u16, ParseIntError> {
     // Use leptonica to get ocr and parse it
     let mut lt = leptess::LepTess::new(None, "eng").unwrap();
-    lt.set_image("./ping.png");
+    lt.set_image("./pingp.png");
 
     let result = lt.get_utf8_text().unwrap();
 
@@ -39,7 +40,7 @@ pub fn ocr_ping() -> Result<u16, ParseIntError> {
 pub fn ocr_text() -> String {
     // Use leptonica to get ocr and parse it
     let mut lt = leptess::LepTess::new(None, "eng").unwrap();
-    lt.set_image("./ping.png");
+    lt.set_image("./scorep.png");
 
     let result = lt.get_utf8_text().unwrap();
 
@@ -53,4 +54,41 @@ pub fn ocr_text() -> String {
     }
 
     out
+}
+
+
+pub fn ocr_score() -> [u8;2] {
+    // Use leptonica to get ocr and parse it
+    let mut lt = leptess::LepTess::new(None, "eng").unwrap();
+    lt.set_image("./scorep.png");
+
+    let mut result = lt.get_utf8_text().unwrap();
+
+    let mut score_a = 0;
+    let mut score_b = 0;
+
+    if Regex::new(r#"(\d*-\d*)"#).unwrap().is_match(result.as_str()) {
+
+        println!("{}", result.as_str());
+
+        let a = result.substring(
+            0,
+            result.to_lowercase().rfind("-").unwrap_or(0),
+        );
+
+        let b = result.substring(
+            result.to_lowercase().rfind("-").unwrap_or(0) + 1,
+            result.len(),
+        );
+
+        println!("{}", a);
+
+        println!("{}", b);
+
+        score_a = a.replace("\n", "").replace(r#" "#, "").parse().unwrap();
+
+        score_b = b.replace("\n", "").replace(r#" "#, "").parse().unwrap();
+    }
+
+    [score_a, score_b]
 }

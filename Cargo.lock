@@ -828,6 +828,7 @@ dependencies = [
  "inputbot",
  "leptess",
  "palette",
+ "regex",
  "rgb",
  "screenshots",
  "substring",

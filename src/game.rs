@@ -38,7 +38,7 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
         .clone()
         .capture_area(
             0,
-            (pscreen.clone().display_info.height - 50)
+            (pscreen.clone().display_info.height - 100)
                 .try_into()
                 .unwrap(),
             500,
@@ -53,11 +53,11 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
     // Convert the u8 buffer to rgb and then make a mask
     // Put the mask in an new image
 
-    /*let mut new_img = image::RgbaImage::new(image.width(), image.height());
+    let mut new_img = image::RgbaImage::new(image.width(), image.height());
 
     // Crippling depressurizatuion
     let better_image = ImageReader::open("ping.png").unwrap().decode().unwrap();
-    let pixels = better_image.as_rgba8().unwrap().as_rgb();
+    let pixels = better_image.as_rgba8().unwrap().as_rgba();
     
     for y in 1..image.height() { 
         for x in 1..image.width() -1 {
@@ -75,17 +75,24 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
             // Convert to hsv so we can see brightness
             let hsvcolor: Hsv = Srgb::new(pixel.r as f32 / 250 as f32, pixel.g as f32 /250 as f32, pixel.b as f32 / 250 as f32).into_color();
 
+            // Make slight changes
+            let hsvchanged = Hsv::new(hsvcolor.hue, 0.0, hsvcolor.value.powf(2.0));
+
+            // back to rgb
+            let rgbcolor: Srgba = hsvchanged.clone().into_color();
+
             //assert!(Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).red == pixel.r as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).green == pixel.g as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).blue == pixel.b as f32);
 
             // If not bright enough, make it black
-            //if hsvcolor.value < 0.8 {
-            //    new_img.put_pixel(x, y, Rgba([0, 0, 0, 0]));
-            //}
+            if hsvcolor.value < 0.4 {
+                new_img.put_pixel(x, y, Rgba([0, 0, 0, pixel.a]));
+            }
 
-            //else {
-            //    new_img.put_pixel(x, y, Rgba([pixel.r, pixel.g, pixel.b, 255]));
-            //}
-            new_img.put_pixel(x, y, image::Rgba([pixel.r, pixel.g, pixel.b, 255]));
+            else {
+                new_img.put_pixel(x, y, Rgba([(rgbcolor.red * 255.0) as u8, (rgbcolor.green * 255.0) as u8, (rgbcolor.blue * 255.0) as u8, (rgbcolor.alpha * 255.0) as u8]));
+            }
+            //new_img.put_pixel(x, y, Rgba([(rgbcolor.red * 255.0) as u8, (rgbcolor.green * 255.0) as u8, (rgbcolor.blue * 255.0) as u8, (rgbcolor.alpha * 255.0) as u8]));
+            //new_img.put_pixel(x, y, image::Rgba([pixel.r, pixel.g, pixel.b, pixel.a]));
             
         }
     }
@@ -93,8 +100,9 @@ pub fn get_ping(gamedata: &mut types::GameData) -> Result<u16, ParseIntError> {
     
 
     // We need to write it aaaaaaaaaaa
-    new_img.save("./pingp.jpg");*/
+    new_img.save("./pingp.png");
 
+    
     // Give it to leptonica to get the cocaine
 
     let mut ocrresult = ocr::ocr_ping();
@@ -169,4 +177,116 @@ pub fn get_primary_players() -> String {
 
     // Return what we get
     ocrresult
+}
+
+pub fn get_score() -> [u8; 2] {
+    // Get screenshot from monitor
+
+    let screens = Screen::all().unwrap();
+
+    // Dummy screen is first one in vector
+    let mut pscreen = screens.clone().into_iter().nth(0).unwrap();
+
+    // Look for the primary one
+    for screen in screens {
+        if screen.display_info.is_primary {
+            // that one is now our primary one
+            pscreen = screen.clone();
+        }
+    }
+
+    // And take a screenshot on that one
+
+    /*
+
+    Here we are working with screen percentages
+    So like for example 800 / 1920 = 41.6% of the screen width
+    So that is how we can then hopefully scale properly from ultrawide, 4k and other resolutions
+
+     */
+    let sun_left = pscreen.clone().display_info.width as f32 / 2 as f32 - (25 as f32 / 1920 as f32) * pscreen.clone().display_info.width as f32; //x
+    let sun_upper = (62 as f32 / 1080 as f32) * pscreen.clone().display_info.height as f32; //y
+    let sun_right = (50 as f32 / 1920 as f32) * pscreen.clone().display_info.width as f32; //width
+    let sun_lower = (28 as f32 / 1080 as f32) * pscreen.clone().display_info.height as f32; //height
+
+    let image = pscreen
+        .clone()
+        .capture_area(
+            sun_left as i32,
+            sun_upper as i32,
+            sun_right as u32,
+            sun_lower as u32
+        )
+        .unwrap();
+
+    let buffer = image.buffer();
+    // We need to write it aaaaaaaaaaa
+    fs::write("./score.png", &buffer).unwrap();
+
+    // Convert the u8 buffer to rgb and then make a mask
+    // Put the mask in an new image
+
+    let mut new_img = image::RgbaImage::new(image.width(), image.height());
+
+    // Crippling depressurizatuion
+    let better_image = ImageReader::open("score.png").unwrap().decode().unwrap();
+    let pixels = better_image.as_rgba8().unwrap().as_rgba();
+    
+    for y in 1..image.height() { 
+        for x in 1..image.width() -1 {
+
+            let index = (((y - 1) * image.width()) + x);
+
+            // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            // HElp
+            if index >= pixels.len() as u32 {break;}
+
+            let mut pixel = pixels[index as usize];
+
+            //println!("{:?}", pixel);
+
+            // Convert to hsv so we can see brightness
+            let hsvcolor: Hsv = Srgb::new(pixel.r as f32 / 250 as f32, pixel.g as f32 /250 as f32, pixel.b as f32 / 250 as f32).into_color();
+
+            // Make slight changes
+            let hsvchanged = Hsv::new(hsvcolor.hue, hsvcolor.saturation, hsvcolor.value.powf(2.0));
+
+            // back to rgb
+            let rgbcolor: Srgba = hsvchanged.clone().into_color();
+
+            //assert!(Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).red == pixel.r as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).green == pixel.g as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).blue == pixel.b as f32);
+
+            // If not bright enough, make it black
+            if hsvcolor.value < 0.8 {
+                new_img.put_pixel(x, y, Rgba([0, 0, 0, pixel.a]));
+            }
+
+            else {
+                new_img.put_pixel(x, y, Rgba([(rgbcolor.red * 255.0) as u8, (rgbcolor.green * 255.0) as u8, (rgbcolor.blue * 255.0) as u8, (rgbcolor.alpha * 255.0) as u8]));
+            }
+            //new_img.put_pixel(x, y, Rgba([(rgbcolor.red * 255.0) as u8, (rgbcolor.green * 255.0) as u8, (rgbcolor.blue * 255.0) as u8, (rgbcolor.alpha * 255.0) as u8]));
+            //new_img.put_pixel(x, y, image::Rgba([pixel.r, pixel.g, pixel.b, pixel.a]));
+            
+        }
+    }
+
+    better_image.save("./scorep.png");
+
+    // Give it to leptonica to get the cocaine
+
+    let ocrresult = ocr::ocr_score();
+
+    // Return what we get
+    ocrresult
+}
+
+
+// Calculates the similarity of two rgb colors.
+// returns 0 - 1 float
+fn calculate_color_similarity(a: &Srgb, b: &Srgb) -> f32 {
+    let mut similarity = 0.0;
+
+    similarity = 1.0 - ((a.red - b.red).powi(2) + (a.green - b.green).powi(2) + (a.blue - b.blue).powi(2)).sqrt();
+
+    return similarity;
 }
