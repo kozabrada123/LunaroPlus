@@ -226,7 +226,7 @@ pub fn get_score() -> [u8; 2] {
     // Convert the u8 buffer to rgb and then make a mask
     // Put the mask in an new image
 
-    let mut new_img = image::RgbaImage::new(image.width(), image.height());
+    /*let mut new_img = image::RgbaImage::new(image.width(), image.height());
 
     // Crippling depressurizatuion
     let better_image = ImageReader::open("score.png").unwrap().decode().unwrap();
@@ -249,7 +249,7 @@ pub fn get_score() -> [u8; 2] {
             let hsvcolor: Hsv = Srgb::new(pixel.r as f32 / 250 as f32, pixel.g as f32 /250 as f32, pixel.b as f32 / 250 as f32).into_color();
 
             // Make slight changes
-            let hsvchanged = Hsv::new(hsvcolor.hue, hsvcolor.saturation, hsvcolor.value.powf(2.0));
+            let hsvchanged = Hsv::new(hsvcolor.hue, hsvcolor.saturation, hsvcolor.value);
 
             // back to rgb
             let rgbcolor: Srgba = hsvchanged.clone().into_color();
@@ -257,7 +257,23 @@ pub fn get_score() -> [u8; 2] {
             //assert!(Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).red == pixel.r as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).green == pixel.g as f32 && Srgb::new(pixel.r as f32, pixel.g as f32, pixel.b as f32).blue == pixel.b as f32);
 
             // If not bright enough, make it black
-            if hsvcolor.value < 0.8 {
+            if  calculate_color_similarity(
+                // Pain of a line but essentially if its sun or moon or the - then delete it
+                &rgbcolor.into_color(), // Sun / orange
+                &Srgb::new(0.898, 0.561, 0.224)
+                ) < 0.5
+                ||
+                calculate_color_similarity(
+                &rgbcolor.into_color(), // Moon / blue
+                &Srgb::new(0.176, 0.784, 0.878)
+                ) < 0.5
+                ||
+                calculate_color_similarity(
+                &rgbcolor.into_color(), // White
+                &Srgb::new(1.0, 1.0, 1.0)
+                ) < 0.5
+                 
+                 {
                 new_img.put_pixel(x, y, Rgba([0, 0, 0, pixel.a]));
             }
 
@@ -270,7 +286,7 @@ pub fn get_score() -> [u8; 2] {
         }
     }
 
-    better_image.save("./scorep.png");
+    new_img.save("./scorep.png");*/
 
     // Give it to leptonica to get the cocaine
 
@@ -286,7 +302,7 @@ pub fn get_score() -> [u8; 2] {
 fn calculate_color_similarity(a: &Srgb, b: &Srgb) -> f32 {
     let mut similarity = 0.0;
 
-    similarity = 1.0 - ((a.red - b.red).powi(2) + (a.green - b.green).powi(2) + (a.blue - b.blue).powi(2)).sqrt();
+    similarity = ((a.red - b.red).powi(2) + (a.green - b.green).powi(2) + (a.blue - b.blue).powi(2)).sqrt();
 
     return similarity;
 }

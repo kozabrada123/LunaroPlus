@@ -60,7 +60,7 @@ pub fn ocr_text() -> String {
 pub fn ocr_score() -> [u8;2] {
     // Use leptonica to get ocr and parse it
     let mut lt = leptess::LepTess::new(None, "eng").unwrap();
-    lt.set_image("./scorep.png");
+    lt.set_image("./score.png");
 
     let mut result = lt.get_utf8_text().unwrap();
 

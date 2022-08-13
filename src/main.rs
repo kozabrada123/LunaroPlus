@@ -55,6 +55,7 @@ fn main() {
             }
         }
 
+        //println!("{:?}", game::get_score());
 
         // Only print if it isnt the exact same
         if out_p != out {
